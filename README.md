@@ -1,92 +1,81 @@
-Image Recognition (Flask + OpenCV + SQLite)
+
+# Image Recognition (Flask + OpenCV + SQLite)
 
 A simple Flask application for image-based item recognition, leveraging OpenCV's ORB feature descriptor and a SQLite database for storing items and their associated images.
 
-🚀 Features
+## 🚀 Features
 
-Item Management: CRUD operations for items with multiple images per item and a reference URL.
+### Item Management
+- **CRUD Operations:** Manage items with Create, Read, Update, and Delete functionalities.
+- **Multiple Images:** Associate multiple images per item.
+- **Reference URL:** Link each item to a reference URL.
 
-Image Processing:
+### Image Processing
+- **Blurriness Check:** Ensure image clarity using Laplacian variance.
+- **ORB Descriptors:** Utilize ORB feature descriptors for reliable feature matching.
 
-Blurriness check to ensure image clarity.
+### Recognition System
+- **Descriptor Comparison:** Compare new image descriptors against stored items.
+- **Threshold-Based Classification:**
+  - **High Confidence:** Confident match found.
+  - **Borderline:** Prompt for more images.
+  - **No Match:** Notify the user of no match.
 
-ORB descriptors for reliable feature matching.
+### User Interface
+- **Image Capture:** Capture images via webcam or upload from desktop/mobile.
 
-Recognition System:
+### Authentication
+- **Single-User Login:** Secure login with hashed passwords (bcrypt).
+- **Session Management:** Session-based authentication with configurable lockout after failed attempts.
 
-Compares new image descriptors against stored items.
+## 🛠️ Tech Stack
 
-Threshold-based classification: high confidence, borderline, or no match.
+- **Backend:** Python (Flask)
+- **Image Processing:** OpenCV
+- **Database:** SQLite
+- **Frontend:** JavaScript, HTML/CSS, Jinja2
 
-User Interface:
+## 📂 Table of Contents
 
-Capture images via webcam or upload from desktop/mobile.
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+  - [Clone the Repo](#clone-the-repo)
+  - [Install Dependencies](#install-dependencies)
+  - [Environment Variables](#environment-variables)
+  - [Run the Application](#run-the-application)
+- [How It Works](#-how-it-works)
+  - [Item Addition Workflow](#item-addition-workflow)
+  - [Recognition Workflow](#recognition-workflow)
+- [Project Structure](#-project-structure)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Author](#-author)
 
-Authentication:
+## 🏁 Getting Started
 
-Single-user login with hashed passwords (bcrypt).
+### Clone the Repo
 
-Session-based authentication and configurable lockout after failed attempts.
-
-🛠️ Tech Stack
-
-Backend: Python (Flask)
-
-Image Processing: OpenCV
-
-Database: SQLite
-
-Frontend: JavaScript, HTML/CSS, Jinja2
-
-📂 Table of Contents
-
-Features
-
-Tech Stack
-
-Getting Started
-
-Clone the Repo
-
-Install Dependencies
-
-Environment Variables
-
-Run the Application
-
-How It Works
-
-Item Addition Workflow
-
-Recognition Workflow
-
-Project Structure
-
-Contributing
-
-License
-
-Author
-
-🏁 Getting Started
-
-Clone the Repo
-
+```bash
 git clone https://github.com/Charisn/Image_recognition.git
 cd Image_recognition
+```
 
-Install Dependencies
+### Install Dependencies
 
-Ensure Python 3.8+ and pip are installed, then run:
+Ensure Python 3.8+ and `pip` are installed, then run:
 
+```bash
 pip install -r requirements.txt
+```
 
-If requirements.txt is missing, manually install key modules: flask, python-dotenv, opencv-python, numpy, bcrypt, etc.
+*If `requirements.txt` is missing, manually install key modules: `flask`, `python-dotenv`, `opencv-python`, `numpy`, `bcrypt`, etc.*
 
-Environment Variables
+### Environment Variables
 
-Create a .env file in the project root:
+Create a `.env` file in the project root:
 
+```env
 SECRET_KEY=some-random-key
 UPLOAD_FOLDER=static/uploads
 MAX_CONTENT_LENGTH_MB=10
@@ -97,59 +86,47 @@ LOCKOUT_MINUTES=15
 DB_PATH=database/items.db
 PORT=443
 DEBUG=1
+```
 
-Note:
+**Note:**
+- `PORT=443` implies HTTPS. For HTTP (e.g., port `5000`), adjust `PORT` accordingly.
+- On first run, the app auto-creates the database and uploads folders.
 
-PORT=443 implies HTTPS. For HTTP (e.g., port 5000), adjust PORT accordingly.
+### Run the Application
 
-On first run, the app auto-creates the database and uploads folders.
-
-Run the Application
-
+```bash
 python app.py
+```
 
-Access the app at https://localhost:443 (or your configured host/port).
+Access the app at [https://localhost:443](https://localhost:443) (or your configured host/port).
 
-🔎 How It Works
+## 🔎 How It Works
 
-Item Addition Workflow
+### Item Addition Workflow
 
-Login: Go to /login and enter your credentials.
+1. **Login:** Go to `/login` and enter your credentials.
+2. **Add Item:** Navigate to `/add` and submit the item's URL.
+3. **Capture Images:** Provide 3 clear images:
+   - **Blurriness Check:** Ensures image clarity using Laplacian variance.
+   - **ORB Descriptors:** Generated and stored for feature matching.
+4. **Completion:** After successful uploads, the item is ready for recognition.
 
-Add Item: Navigate to /add and submit the item's URL.
+### Recognition Workflow
 
-Capture Images: Provide 3 clear images:
+1. **Navigate to `/view`.**
+2. **Capture/Upload an Image.**
+3. **Processing:**
+   - **Blurriness Check:** Ensures image clarity.
+   - **ORB Descriptor Computation:** Extract features from the image.
+   - **Descriptor Comparison:** Compare against stored items.
+4. **Results:**
+   - **High Confidence:** Redirect to the item's URL.
+   - **Borderline:** Prompt for more images.
+   - **No Match:** Notify the user of no match.
 
-Blurriness check (Laplacian variance).
+## 📁 Project Structure
 
-ORB descriptors generated and stored.
-
-Completion: After successful uploads, the item is ready for recognition.
-
-Recognition Workflow
-
-Navigate to /view.
-
-Capture/Upload an image.
-
-Processing:
-
-Blurriness check.
-
-ORB descriptor computation.
-
-Descriptor comparison against stored items.
-
-Results:
-
-High confidence: Redirect to item URL.
-
-Borderline: Prompt for more images.
-
-No match: Notify the user.
-
-📁 Project Structure
-
+```
 Image_recognition/
 ├── app.py                # Main Flask application
 ├── scripts.js            # Client-side camera handling
@@ -167,31 +144,39 @@ Image_recognition/
 ├── .env                  # Environment config
 ├── requirements.txt      # Project dependencies
 └── README.md             # Project documentation
+```
 
-🤝 Contributing
+## 🤝 Contributing
 
-Fork the repository
+1. **Fork the repository**
+2. **Create a feature branch**
 
-Create a feature branch
+    ```bash
+    git checkout -b feature/new-stuff
+    ```
 
-git checkout -b feature/new-stuff
+3. **Commit changes**
 
-Commit changes
+    ```bash
+    git commit -m 'Add new feature'
+    ```
 
-git commit -m 'Add new feature'
+4. **Push to your branch**
 
-Push to your branch
+    ```bash
+    git push origin feature/new-stuff
+    ```
 
-git push origin feature/new-stuff
+5. **Open a Pull Request**
 
-Open a Pull Request
+## 📜 License
 
-📜 License
+This project is open-source. Feel free to modify and use it as needed. Check the `LICENSE` file for more details.
 
-This project is open-source. Feel free to modify and use it as needed. Check the LICENSE file for more details.
+## 👤 Author
 
-👤 Author
+**Charisn**
 
-CharisnSenior Software Engineer passionate about solving problems and exploring new technologies.
+Senior Software Engineer passionate about solving problems and exploring new technologies.
 
 Questions or ideas? Open an issue or submit a pull request!
