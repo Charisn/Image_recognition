@@ -40,6 +40,7 @@ MAX_LOGIN_TRIES = int(os.getenv('MAX_LOGIN_TRIES', 5))
 LOCKOUT_MINUTES = int(os.getenv('LOCKOUT_MINUTES', 15))
 
 DB_PATH = os.getenv('DB_PATH', 'database/items.db')
+os.makedirs('database', exist_ok=True)
 ORB = cv2.ORB_create()
 
 def get_db():
