@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container index-container">
+  <h1 class="title">Welcome</h1>
+  
+  <div class="button-container">
+    <button class="animated-button slide-in" onclick="window.location.href='/add'">
+      Add Item
+    </button>
+    <button class="animated-button pulse" onclick="window.location.href='/view'">
+      View Item
+    </button>
+  </div>
+</div>
+{% endblock %}

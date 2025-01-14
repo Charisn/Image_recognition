@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Add more images for item #{{ item_id }}</h2>
+<p>We need 2 more images to improve recognition.</p>
+<video id="video" autoplay></video>
+<canvas id="canvas" style="display:none;"></canvas>
+<button id="captureBtn">Capture Photo</button>
+
+<form id="uploadForm" action="/add_more_images" method="POST">
+  <input type="hidden" name="imgData" id="imgData">
+  <input type="hidden" name="item_id" value="{{ item_id }}">
+</form>
+
+<script>
+  startCameraVideo('video');
+
+  document.getElementById('captureBtn').addEventListener('click', () => {
+    const dataUrl = captureToCanvas('video', 'canvas', 0.7);
+    document.getElementById('imgData').value = dataUrl;
+    document.getElementById('uploadForm').submit();
+  });
+</script>
+<p><a href="/">Cancel</a></p>
+{% endblock %}

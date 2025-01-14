@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  /* =======================
+     MODERN LOGIN STYLES
+     ======================= */
+
+  /* Page wrapper for full-height gradient background */
+  .login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(120deg, #4b6cb7, #182848);
+    min-height: 100vh;
+    margin: 0;
+  }
+
+  /* Card container for the form */
+  .login-card {
+    background: #ffffff;
+    max-width: 400px;
+    width: 90%;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Title styling */
+  .login-title {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+  }
+
+  /* Optional welcome message or subtitle */
+  .login-subtitle {
+    text-align: center;
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    color: #555;
+  }
+
+  /* Flash messages area */
+  .login-flash {
+    background-color: #ffe6e6;
+    border: 1px solid #ffcccc;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: #cc0000;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  /* Form elements */
+  .login-form {
+    display: flex;
+    flex-direction: column;
+  }
+  .input-field {
+    margin-bottom: 1.2rem;
+  }
+  .input-field label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+  }
+  .input-field input {
+    width: 95%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    outline: none;
+  }
+  .input-field input:focus {
+    border-color: #5c6ac4;
+    box-shadow: 0 0 3px rgba(92, 106, 196, 0.4);
+  }
+
+  /* Submit button */
+  .login-btn {
+    cursor: pointer;
+    background-color: #5c6ac4;
+    color: #fff;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background 0.2s ease;
+  }
+  .login-btn:hover {
+    background-color: #525da6;
+  }
+
+  /* Extra link or small text (optional) */
+  .extra-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  .extra-link a {
+    text-decoration: none;
+    color: #5c6ac4;
+    font-weight: 600;
+  }
+
+  /* Ensure mobile responsiveness */
+  @media (max-width: 480px) {
+    .login-card {
+      padding: 1.5rem;
+    }
+    .login-title {
+      font-size: 1.6rem;
+    }
+  }
+</style>
+
+<div class="login-page">
+  <div class="login-card">
+    <h1 class="login-title">Welcome</h1>
+    <p class="login-subtitle">Please log in to continue</p>
+
+    <!-- Display any flashed messages (errors, lockout notices, etc.) -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="login-flash">
+          {% for msg in messages %}
+            <p>{{ msg }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Login form -->
+    <form action="{{ url_for('login') }}" method="POST" class="login-form">
+      <div class="input-field">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username"
+          name="username" 
+          placeholder="Enter your username"
+          required>
+      </div>
+      <div class="input-field">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password"
+          name="password" 
+          placeholder="Enter your password"
+          required>
+      </div>
+      <button type="submit" class="login-btn">Log In</button>
+    </form>
+
+    <!-- Optional link or footer text below the form -->
+    <div class="extra-link">
+      <!-- Example: <a href="#">Forgot Password?</a> -->
+    </div>
+  </div>
+</div>
+{% endblock %}

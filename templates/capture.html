@@ -1,0 +1,32 @@
+<div class="camera-container">
+  <h2 class="camera-title">Capture an Image</h2>
+  
+  <!-- Camera Input -->
+  <div class="input-container">
+    <input type="file" name="image" accept="image/*" capture="environment" id="cameraInput">
+  </div>
+
+  <!-- Hidden Form for Upload -->
+  <form id="uploadForm" action="/capture" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="imgData" id="imgData">
+  </form>
+</div>
+
+<script>
+  const cameraInput = document.getElementById('cameraInput');
+  const imgData = document.getElementById('imgData');
+  const uploadForm = document.getElementById('uploadForm');
+
+  // On file selection, submit the form
+  cameraInput.addEventListener('change', () => {
+    const file = cameraInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        imgData.value = reader.result; // Base64 data
+        uploadForm.submit();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>

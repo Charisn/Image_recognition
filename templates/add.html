@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="overlay" id="add-modal">
+  <div class="modal">
+    <h2 class="modal-title">Add a New Item</h2>
+    <form method="POST" class="modal-form">
+      <label for="itemURL">URL:</label>
+      <input type="text" id="itemURL" name="itemURL" placeholder="https://example.com" required>
+      <button type="submit" class="animated-button">Start Capture</button>
+    </form>
+    <p><a href="/" class="back-link">Back Home</a></p>
+  </div>
+</div>
+
+{% endblock %}

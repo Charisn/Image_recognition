@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Mobile Camera App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, 
+                                 user-scalable=no, 
+                                 minimum-scale=1.0, 
+                                 maximum-scale=1.0" />
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash-messages">
+        <!-- {% for msg in messages %}
+          <div class="alert alert-danger">{{ msg }}</div>
+        {% endfor %} -->
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</body>
+</html>

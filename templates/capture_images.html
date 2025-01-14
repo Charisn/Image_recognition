@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Take <span id="remaining-count">3</span> images from different angles</h2>
+  <div class="image-grid">
+    <div class="image-container" id="image-1">
+      <img src="" alt="Image 1" style="display:none;">
+      <button class="remove-btn" onclick="removeImage(1)" style="display:none;">X</button>
+    </div>
+    <div class="image-container" id="image-2">
+      <img src="" alt="Image 2" style="display:none;">
+      <button class="remove-btn" onclick="removeImage(2)" style="display:none;">X</button>
+    </div>
+    <div class="image-container" id="image-3">
+      <img src="" alt="Image 3" style="display:none;">
+      <button class="remove-btn" onclick="removeImage(3)" style="display:none;">X</button>
+    </div>
+  </div>
+  <button class="camera-btn" onclick="openCamera()">Open Camera</button>
+</div>
+
+<script>
+  let images = []; // To hold the captured image data
+  let successfulUploads = 0; // Track how many have successfully uploaded
+
+  function openCamera() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.capture = "camera";
+
+    input.onchange = async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (images.length >= 3) {
+        alert("You can only take 3 images.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const MAX_WIDTH = 1024;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const compressedImage = canvas.toDataURL("image/jpeg", 0.7); // 70% quality
+
+          addImage(compressedImage);
+        };
+      };
+
+      reader.readAsDataURL(file);
+    };
+
+    input.click();
+  }
+
+  function addImage(imageData) {
+    // Push to the array
+    images.push(imageData);
+
+    // The new image’s index is simply the new length
+    const index = images.length;
+
+    // Update UI for that index
+    const imgContainer = document.getElementById(`image-${index}`);
+    const imgElement = imgContainer.querySelector("img");
+    const removeButton = imgContainer.querySelector(".remove-btn");
+
+    imgElement.src = imageData;
+    imgElement.style.display = "block";
+    removeButton.style.display = "inline";
+
+    // Show spinner on that image
+    imgContainer.classList.add("uploading");
+    imgContainer.classList.remove("upload-error", "upload-success");
+
+    // Update counter
+    updateCounter();
+
+    // Show hint if adding the 2nd image
+    if (images.length === 2) {
+      const message = document.createElement("p");
+      message.id = "last-image-text";
+      message.textContent = "Add the last image to proceed.";
+      document.querySelector(".container").appendChild(message);
+    }
+    // If the array is now full (3 images), remove that hint
+    else if (images.length === 3) {
+      document.getElementById("last-image-text")?.remove();
+    }
+
+    // Trigger async upload for the newly added image
+    asyncUploadImage(imageData, index);
+  }
+
+  // Modified upload logic
+  async function asyncUploadImage(imageData, index) {
+    const blob = await (await fetch(imageData)).blob();
+    const formData = new FormData();
+    formData.append("image", blob);
+    formData.append("item_id", sessionStorage.getItem("new_item_id"));
+
+    const response = await fetch("/add_image", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    // Identify the correct container by the index passed in
+    const imgContainer = document.getElementById(`image-${index}`);
+
+    if (!response.ok) {
+      // Show error animation
+      imgContainer.classList.remove("uploading");
+      imgContainer.classList.add("upload-error");
+      alert(result.error || "An error occurred. Please try again.");
+      return;
+    }
+
+    // On success
+    imgContainer.classList.remove("uploading");
+    imgContainer.classList.add("upload-success");
+    successfulUploads++;
+
+    // When all images have successfully uploaded
+    if (successfulUploads === 3) {
+      showSuccessAnimation();
+    }
+  }
+
+  function showSuccessAnimation() {
+    setTimeout(() => {
+      const successDiv = document.createElement("div");
+      successDiv.className = "success-animation";
+      successDiv.innerHTML = `
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+          <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+          <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+        </svg>
+      `;
+      document.querySelector(".container").appendChild(successDiv);
+
+      // Redirect 2 seconds after animation
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2500);
+    }, 1000);
+  }
+
+  function removeImage(index) {
+    images.splice(index - 1, 1);
+
+    // Reset UI for each container from this index onward
+    for (let i = index; i <= 3; i++) {
+      const imgContainer = document.getElementById(`image-${i}`);
+      const imgElement = imgContainer.querySelector("img");
+      const removeButton = imgContainer.querySelector(".remove-btn");
+
+      // Shift each subsequent image's data up one position
+      if (i <= images.length) {
+        imgElement.src = images[i - 1];
+        imgElement.style.display = "block";
+        removeButton.style.display = "inline";
+        imgContainer.classList.remove(
+          "uploading",
+          "upload-success",
+          "upload-error"
+        );
+        imgContainer.classList.add("uploading"); // re-mark as uploading if you want
+      } else {
+        // Clear out the container
+        imgElement.src = "";
+        imgElement.style.display = "none";
+        removeButton.style.display = "none";
+        imgContainer.classList.remove(
+          "uploading",
+          "upload-success",
+          "upload-error"
+        );
+      }
+    }
+
+    // Update counter
+    updateCounter();
+
+    // Remove the "Add the last image" text if fewer than 2 images remain
+    if (images.length < 2) {
+      document.getElementById("last-image-text")?.remove();
+    }
+
+    // If you want to decrement successfulUploads if a removed image was success
+    // you'd need additional logic to track that. (Optional)
+  }
+
+  function updateCounter() {
+    const remaining = 3 - images.length;
+    document.getElementById("remaining-count").innerText = remaining;
+  }
+</script>
+{% endblock %}

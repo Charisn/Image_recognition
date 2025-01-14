@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="camera-container">
+  <h2 class="camera-title">Compare and View Item</h2>
+
+  <!-- Image Container -->
+  <div class="image-container view-image-container">
+    <img id="previewImage" style="display:none; max-width: 0%;" />
+  </div>
+
+  <!-- File Input -->
+  <button id="openCamera" class="camera-btn view-camera-btn">Open Camera</button>
+  <input type="file" id="cameraInput" accept="image/*" capture="camera" style="display:none;" />
+
+  <!-- Upload Animation -->
+  <div id="uploadAnimation" class="upload-animation" style="display:none;">
+    <p>Processing...</p>
+  </div>
+
+  <p><a href="/" class="back-link">Back Home</a></p>
+</div>
+
+<script>
+  const openCamera = document.getElementById("openCamera");
+  const cameraInput = document.getElementById("cameraInput");
+  const previewImage = document.getElementById("previewImage");
+
+  // Trigger camera input
+  openCamera.addEventListener("click", () => {
+    cameraInput.click();
+  });
+
+  // Handle image input
+  cameraInput.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Show processing animation
+    showUploadAnimation();
+
+    // Compress the image
+    const compressedImage = await compressImage(file);
+
+    // Convert to Base64 for preview
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64Image = e.target.result;
+      previewImage.src = base64Image;
+      previewImage.style.display = "block";
+
+      // Send image to server for processing
+      const response = await fetch("/view", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imgData: base64Image }),
+      });
+
+      // Hide animation and handle response
+      hideUploadAnimation();
+      const result = await response.json();
+
+      if (response.ok) {
+        if (result.redirectUrl) {
+          window.location.href = result.redirectUrl;
+        } else if (result.borderline) {
+          alert("Borderline match. Consider adding more images.");
+        } else {
+          alert("No matching item found.");
+        }
+      } else {
+        alert("Error processing image. Please try again.");
+      }
+    };
+
+    reader.readAsDataURL(compressedImage);
+  });
+
+  async function compressImage(file) {
+    const img = new Image();
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    return new Promise((resolve) => {
+      img.onload = () => {
+        const maxWidth = 800;
+        const scale = Math.min(maxWidth / img.width, 1);
+
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.7);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  function showUploadAnimation() {
+    document.getElementById("uploadAnimation").style.display = "flex";
+  }
+
+  function hideUploadAnimation() {
+    document.getElementById("uploadAnimation").style.display = "none";
+  }
+</script>
+
+{% endblock %}

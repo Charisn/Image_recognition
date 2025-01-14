@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Item Recognized!</h2>
+<p>We found a matching item (ID: {{ item_id }}). Redirecting you to:</p>
+<p><strong>{{ url }}</strong></p>
+<script>
+  // Redirect after a short delay (2 seconds)
+  setTimeout(function() {
+    window.location.href = "{{ url }}";
+  }, 2000);
+</script>
+{% endblock %}
